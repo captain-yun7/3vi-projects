@@ -1,0 +1,16 @@
+# LangGraph PoC 필수 라이브러리
+# 설치 방법: pip install -r requirements.txt
+
+# LangGraph 및 LangChain 코어
+langgraph>=0.2.0
+langchain>=0.2.0
+langchain-openai>=0.1.0
+
+# 환경 변수 관리
+python-dotenv>=1.0.0
+
+# 타입 힌트 (Python 3.9 이하에서 필요)
+typing-extensions>=4.5.0
+
+# 포트 스캔 (advanced_poc.py에서 실제 nmap 사용)
+python-nmap>=0.7.1
