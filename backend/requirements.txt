@@ -1,0 +1,36 @@
+# FastAPI & Web Framework
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+pydantic==2.10.3
+pydantic-settings==2.6.1
+python-multipart==0.0.20
+
+# Database
+sqlalchemy==2.0.36
+alembic==1.13.3
+psycopg2-binary==2.9.10
+
+# Redis
+redis==5.2.0
+
+# LangGraph & AI
+langgraph==0.2.56
+langchain==0.3.13
+langchain-openai==0.2.14
+langchain-community==0.3.13
+openai==1.57.2
+
+# Security Scanning Tools
+python-nmap==0.7.1
+
+# HTTP Client
+httpx==0.28.1
+
+# WebSocket
+websockets==14.1
+
+# Environment & Config
+python-dotenv==1.0.1
+
+# Utils
+python-dateutil==2.9.0

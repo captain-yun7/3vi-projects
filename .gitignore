@@ -45,6 +45,7 @@ Thumbs.db
 # 프로젝트 특정
 scan_report.txt
 *.log
+logs/
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -52,3 +53,31 @@ scan_report.txt
 # WBS HTML (너무 큼)
 WBS.html
 resources/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Alembic
+alembic/versions/*.py
+!alembic/versions/.gitkeep
+
+# Test
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Temporary files
+*.tmp
+*.bak

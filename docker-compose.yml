@@ -1,0 +1,105 @@
+version: '3.8'
+
+services:
+  # PostgreSQL 데이터베이스
+  postgres:
+    image: postgres:14-alpine
+    container_name: 3vi-postgres
+    environment:
+      POSTGRES_USER: secuser
+      POSTGRES_PASSWORD: secpass
+      POSTGRES_DB: securitydb
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U secuser -d securitydb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - 3vi-network
+
+  # Redis (캐시 및 Celery 브로커)
+  redis:
+    image: redis:7-alpine
+    container_name: 3vi-redis
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - 3vi-network
+
+  # Backend API (Phase 2에서 활성화)
+  # backend:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   container_name: 3vi-backend
+  #   command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+  #   volumes:
+  #     - ./backend:/app
+  #   ports:
+  #     - "8000:8000"
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #   networks:
+  #     - 3vi-network
+
+  # Celery Worker (Phase 3에서 활성화)
+  # celery_worker:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   container_name: 3vi-celery-worker
+  #   command: celery -A celery_app worker --loglevel=info
+  #   volumes:
+  #     - ./backend:/app
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - redis
+  #     - postgres
+  #   networks:
+  #     - 3vi-network
+
+  # Celery Flower (모니터링, Phase 3에서 활성화)
+  # celery_flower:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   container_name: 3vi-celery-flower
+  #   command: celery -A celery_app flower --port=5555
+  #   ports:
+  #     - "5555:5555"
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - redis
+  #     - celery_worker
+  #   networks:
+  #     - 3vi-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  3vi-network:
+    driver: bridge
