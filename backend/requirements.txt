@@ -18,7 +18,7 @@ langgraph==0.2.56
 langchain==0.3.13
 langchain-openai==0.2.14
 langchain-community==0.3.13
-openai==1.57.2
+openai>=1.58.1
 
 # Security Scanning Tools
 python-nmap==0.7.1
