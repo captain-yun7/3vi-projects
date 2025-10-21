@@ -2,7 +2,7 @@
 스캔 요청/응답 스키마
 """
 from pydantic import BaseModel, Field, validator
-from typing import Literal
+from typing import Literal, Optional, List, Dict
 import ipaddress
 
 

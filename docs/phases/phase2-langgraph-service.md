@@ -867,10 +867,22 @@ curl http://localhost:8000/api/v1/langgraph/scan/abc-123/result
 - `backend/app/api/v1/langgraph.py`
 
 ### 체크포인트
-- [ ] POST /scan 엔드포인트가 작동하는가?
-- [ ] GET /scan/{id} 상태 조회가 작동하는가?
-- [ ] GET /scan/{id}/result 결과 조회가 작동하는가?
-- [ ] Swagger 문서에 API가 표시되는가?
+- [x] POST /scan 엔드포인트가 작동하는가?
+- [x] GET /scan/{id} 상태 조회가 작동하는가?
+- [x] GET /scan/{id}/result 결과 조회가 작동하는가?
+- [x] Swagger 문서에 API가 표시되는가?
+
+**구현 완료 내역 (2025-10-21)**
+- ✅ `/api/v1/langgraph/scan` - POST: 스캔 시작 (202 Accepted)
+- ✅ `/api/v1/langgraph/scan/{session_id}` - GET: 상태 조회
+- ✅ `/api/v1/langgraph/scan/{session_id}/result` - GET: 결과 조회
+- ✅ `/api/v1/langgraph/sessions` - GET: 세션 목록
+- ✅ `/api/v1/langgraph/scan/{session_id}` - DELETE: 세션 삭제
+- ✅ 임시 메모리 저장소 구현 (Phase 2.4에서 DB로 전환 예정)
+- ✅ test_api.py 작성 및 테스트 성공
+  - 포트 스캔: 22(ssh), 80(http) 발견
+  - 취약점 분석: SSH 취약점 탐지
+  - 리스크 평가 및 보고서 생성 정상 작동
 
 ---
 

@@ -7,7 +7,7 @@ import logging
 
 from app.core.config import settings
 from app.core.logging import setup_logging
-from app.api.v1 import health
+from app.api.v1 import health, langgraph
 
 # 로깅 설정
 setup_logging()
@@ -33,6 +33,7 @@ app.add_middleware(
 
 # 라우터 등록
 app.include_router(health.router, prefix="/api/v1", tags=["health"])
+app.include_router(langgraph.router, prefix="/api/v1/langgraph", tags=["langgraph"])
 
 
 @app.on_event("startup")
