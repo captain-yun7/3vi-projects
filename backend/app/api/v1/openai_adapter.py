@@ -16,6 +16,18 @@ router = APIRouter()
 
 
 # OpenAI 호환 스키마
+class Model(BaseModel):
+    id: str
+    object: str = "model"
+    created: int = 1704067200  # 2024-01-01
+    owned_by: str = "3vi"
+
+
+class ModelList(BaseModel):
+    object: str = "list"
+    data: List[Model]
+
+
 class ChatMessage(BaseModel):
     role: str
     content: str
@@ -32,6 +44,23 @@ class ChatCompletionResponse(BaseModel):
     object: str = "chat.completion"
     model: str = "3vi-scanner"
     choices: List[dict]
+
+
+@router.get("/v1/models", response_model=ModelList)
+async def list_models():
+    """
+    OpenAI 호환 Models API
+
+    사용 가능한 모델 목록 반환
+    """
+    return ModelList(
+        data=[
+            Model(
+                id="3vi-scanner",
+                owned_by="3vi",
+            )
+        ]
+    )
 
 
 @router.post("/v1/chat/completions", response_model=ChatCompletionResponse)

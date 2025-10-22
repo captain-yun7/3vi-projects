@@ -5,6 +5,7 @@ services:
   postgres:
     image: postgres:14-alpine
     container_name: 3vi-postgres
+    restart: unless-stopped
     environment:
       POSTGRES_USER: secuser
       POSTGRES_PASSWORD: secpass
@@ -15,92 +16,61 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - 3vi-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U secuser -d securitydb"]
       interval: 10s
       timeout: 5s
       retries: 5
-    networks:
-      - 3vi-network
 
-  # Redis (캐시 및 Celery 브로커)
-  redis:
-    image: redis:7-alpine
-    container_name: 3vi-redis
-    command: redis-server --appendonly yes
+  # 3VI 백엔드 (FastAPI)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: 3vi-backend
+    restart: unless-stopped
     ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://secuser:secpass@postgres:5432/securitydb
+      SECRET_KEY: your-secret-key-here-change-in-production
+      OPENAI_API_KEY: dummy
+      DEBUG: "True"
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - 3vi-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  # Backend API (Phase 2에서 활성화)
-  # backend:
-  #   build:
-  #     context: ./backend
-  #     dockerfile: Dockerfile
-  #   container_name: 3vi-backend
-  #   command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-  #   volumes:
-  #     - ./backend:/app
-  #   ports:
-  #     - "8000:8000"
-  #   env_file:
-  #     - .env
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #     redis:
-  #       condition: service_healthy
-  #   networks:
-  #     - 3vi-network
-
-  # Celery Worker (Phase 3에서 활성화)
-  # celery_worker:
-  #   build:
-  #     context: ./backend
-  #     dockerfile: Dockerfile
-  #   container_name: 3vi-celery-worker
-  #   command: celery -A celery_app worker --loglevel=info
-  #   volumes:
-  #     - ./backend:/app
-  #   env_file:
-  #     - .env
-  #   depends_on:
-  #     - redis
-  #     - postgres
-  #   networks:
-  #     - 3vi-network
-
-  # Celery Flower (모니터링, Phase 3에서 활성화)
-  # celery_flower:
-  #   build:
-  #     context: ./backend
-  #     dockerfile: Dockerfile
-  #   container_name: 3vi-celery-flower
-  #   command: celery -A celery_app flower --port=5555
-  #   ports:
-  #     - "5555:5555"
-  #   env_file:
-  #     - .env
-  #   depends_on:
-  #     - redis
-  #     - celery_worker
-  #   networks:
-  #     - 3vi-network
-
-volumes:
-  postgres_data:
-    driver: local
-  redis_data:
-    driver: local
+  # Open WebUI 프론트엔드
+  webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: unless-stopped
+    ports:
+      - "3000:8080"
+    environment:
+      OPENAI_API_BASE_URL: http://backend:8000/api/v1
+      OPENAI_API_KEY: sk-dummy
+      ENABLE_OLLAMA_API: "false"
+    volumes:
+      - webui_data:/app/backend/data
+    depends_on:
+      - backend
+    networks:
+      - 3vi-network
 
 networks:
   3vi-network:
     driver: bridge
+
+volumes:
+  postgres_data:
+  webui_data:
