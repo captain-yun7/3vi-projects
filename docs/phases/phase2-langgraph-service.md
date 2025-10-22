@@ -1159,10 +1159,24 @@ async def start_scan(
 - `backend/alembic/versions/001_initial.py`
 
 ### 체크포인트
-- [ ] PostgreSQL이 설치되고 실행 중인가?
-- [ ] Alembic 마이그레이션이 성공했는가?
-- [ ] 스캔 세션이 DB에 저장되는가?
-- [ ] 스캔 결과가 DB에 저장되는가?
+- [x] PostgreSQL이 설치되고 실행 중인가?
+- [x] Alembic 마이그레이션이 성공했는가?
+- [x] 스캔 세션이 DB에 저장되는가?
+- [x] 스캔 결과가 DB에 저장되는가?
+
+**구현 완료 내역 (2025-10-22)**
+- ✅ PostgreSQL Docker 컨테이너 (포트 5433)
+- ✅ SQLAlchemy 엔진 및 세션 설정
+- ✅ `ScanSession` 모델 정의 (UUID, JSONB, Enum)
+- ✅ Alembic 초기화 및 첫 마이그레이션 생성
+- ✅ API 엔드포인트 DB 전환 완료
+  - 메모리 딕셔너리 → PostgreSQL
+  - 의존성 주입 (`Depends(get_db)`)
+  - CRUD 작업 구현
+- ✅ 통합 테스트 성공
+  - 서버 재시작 후 데이터 유지 확인
+  - test_api.py 전체 통과
+- ✅ WSL 환경 PostgreSQL 포트 충돌 해결 (5432 → 5433)
 
 ---
 
